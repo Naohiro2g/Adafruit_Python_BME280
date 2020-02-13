@@ -1,3 +1,7 @@
+OLED SSD1306 to display temparature, humidity, and pressure.
+
+
+
 DEPRECATED LIBRARY  Adafruit_Python_BME280
 ===================
 
