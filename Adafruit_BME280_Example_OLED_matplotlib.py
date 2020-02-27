@@ -28,10 +28,17 @@ sensor = BME280(t_mode=BME280_OSAMPLE_2, p_mode=BME280_OSAMPLE_16, h_mode=BME280
          filter=BME280_FILTER_16, standby=BME280_STANDBY_125)
 
 
-
 plt.ion()
-fig = plt.figure()
+fig = plt.figure(figsize=(8,8),dpi=100)
+fig.suptitle('BME280 Environmental Measurement', fontsize=18)
+plt.tight_layout()
+
 plt.subplots_adjust(hspace=0.5)
+plt.rcParams["font.size"] = 16
+plt.rcParams["font.family"] = "Gen Shin Gothic"
+
+
+
 #ax1 = fig.add_subplot(311, xticks=[], ylim=[-10, 50])
 ax1 = fig.add_subplot(311, ylim=[-10, 50])
 ax2 = fig.add_subplot(312, ylim=[20,80], sharex=ax1)
@@ -41,12 +48,12 @@ ax1.grid()
 ax2.grid()
 ax3.grid()
 
-ax1.set_title("Temperature")
-ax2.set_title("Humidity")
-ax3.set_title("Pressure")
+ax1.set_title("Temperature   温度  (°C)")
+ax2.set_title("Humidity   湿度  (%)")
+ax3.set_title("Pressure   気圧  (hPa  ヘクトパスカル)")
 
 LIST_NUM = 120  # number of plot points
-RATE = 1
+RATE = 2
 
 t = [0] * LIST_NUM
 h = [0] * LIST_NUM
@@ -54,9 +61,9 @@ p = [0] * LIST_NUM
 x = [0] * LIST_NUM
 s = 0
 
-lines1, = ax1.plot(x, t, color='#FF7777', linewidth=8)
-lines2, = ax2.plot(x, t, color='#77FF77', linewidth=8)
-lines3, = ax3.plot(x, t, color='#7777FF', linewidth=8)
+lines1, = ax1.plot(x, t, color='#882222', linewidth=4)
+lines2, = ax2.plot(x, t, color='#228822', linewidth=4)
+lines3, = ax3.plot(x, t, color='#222288', linewidth=4)
 
 
 while True:
@@ -65,12 +72,11 @@ while True:
     hectopascals = pascals / 100
     humidity = sensor.read_humidity()
 
-    #print('Temp      = {0:0.3f} deg C'.format(temperature))
-    #print('Pressure  = {0:0.2f} hPa'.format(hectopascals))
-    #print('Humidity  = {0:0.2f} %'.format(humidity))
 
-#    print('{0:0.3f}'.format(temperature), '{0:0.3f}'.format(humidity), '{0:0.3f}'.format(hectopascals))
+# console
+    print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), '  {0:0.1f}°C'.format(temperature),  '  {0:0.1f}%'.format(humidity),  '  {0:0.2f}hPa'.format(hectopascals))
 
+# OLED
     draw.rectangle(((0, 0), (127, 63)), fill=0)
     draw.text((0, 0), datetime.now().strftime('%Y%m%d %H:%M:%S'), font=f, fill=255)
     draw.text((0, 16), ' 気温   {0:0.1f} °C'.format(temperature), font=f, fill=255)
@@ -78,7 +84,7 @@ while True:
     draw.text((0, 48), ' 気圧 {0:0.2f} hPa'.format(hectopascals), font=f, fill=255)
     oled.image(image)
     
-
+# matplotlib
     x.pop(0)
     t.pop(0)
     h.pop(0)
@@ -88,8 +94,6 @@ while True:
     t.append(temperature)
     h.append(humidity)
     p.append(hectopascals)
-
-#    print(h)
 
     ax1.set_xlim(x[0], x[0] + LIST_NUM / RATE)
 
@@ -101,7 +105,6 @@ while True:
     lines3.set_data(x, p)
 
     s += 1.0 / RATE
-#    plt.pause(1.0 / RATE)
     plt.pause(0.001)
 
     sleep(1.0 / RATE)
